@@ -1,16 +1,16 @@
 # SOC - Azure Sentinel Honeypot Home Lab
 
 ## Description
-Cloud SOC home lab on Microsoft Azure: an intentionally exposed VM acts as a honeypot and forwards its logs to Microsoft Sentinel (SIEM). Malicious login attempts are detected with KQL and plotted on an attack map showing where attacks come from. Includes setup steps, queries, screenshots, and lessons learned.
+Cloud SOC home lab on Microsoft Azure: an intentionally exposed VM acts as a honeypot and forwards its logs to Microsoft Sentinel (SIEM). Malicious login attempts are detected with KQL to show where attacks come from. Includes setup steps, queries, and lessons learned.
 
 
 ## Overview
-This project builds a small Security Operations Center (SOC) environment in the cloud using an Azure free account. A virtual machine is deliberately exposed to the public internet so that real-world attackers find it. The VM is exposed by enabling any inbound traffic on Azure NSG Firewall and disabling Windows Firewall on the VM itself. Its security logs are forwarded to Microsoft Sentinel, where I analyze them with KQL, detect malicious activity, and visualize the geographic origin of the attacks on a map.
+This project builds a small Security Operations Center (SOC) environment in the cloud using an Azure free account. A virtual machine is deliberately exposed to the public internet so that real-world attackers find it. The VM is exposed by enabling any inbound traffic on Azure NSG Firewall and disabling Windows Firewall on the VM itself. Its security logs are forwarded to Microsoft Sentinel, where I analyze them with KQL, detect malicious activity, and show the geographic origin of the attacks.
 
 **Goal:**  practice the core SOC analyst workflow end to end: collect logs, query them, detect suspicious behavior, and report findings.
 
 ## Architecture
-<img src="https://i.imgur.com/SerdDep.jpeg" height="80%" width="80%" alt="Disk Sanitization Steps"/>
+<img src="https://i.imgur.com/SerdDep.jpeg" height="80%" width="80%" alt="Architecture"/>
 
 ## Tools and Technologies
 | Area | Tool |
@@ -21,7 +21,7 @@ This project builds a small Security Operations Center (SOC) environment in the 
 | Log collection | Azure Monitor Agent + Data Collection Rule |
 | SIEM | Microsoft Sentinel on a Log Analytics workspace |
 | Query language | Kusto Query Language (KQL) |
-| Visualization | Sentinel Workbook (map) |
+
 
 
 ## Lab Setup
@@ -107,12 +107,6 @@ SecurityEvent
 | where EventID == 4624 and LogonType in (3, 10)
 | summarize Logons = count() by IpAddress, TargetUserName
 ```
-
-## Attack Map
- 
-- Created a Sentinel **Workbook** with the geo-enriched query (query 3) as its data source.
-- Set the visualization to **Map**, using latitude and longitude, with failed-attempt count as the bubble size.
-![Attack map](images/attack-map.png)
 
 ## Results
  
