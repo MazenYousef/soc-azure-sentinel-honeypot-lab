@@ -1,13 +1,15 @@
 # SOC - Azure Sentinel Honeypot Home Lab
 
 ## Description
-Cloud SOC home lab on Microsoft Azure: an intentionally exposed VM acts as a honeypot and forwards its logs to Microsoft Sentinel (SIEM). Malicious login attempts are detected with KQL to show where attacks come from. Includes setup steps, queries, and lessons learned.
+Cloud SOC home lab on Microsoft Azure: an intentionally exposed VM acts as a honeypot and forwards its logs to Microsoft Sentinel (SIEM). Malicious login attempts are detected with KQL, and each attacking IP is geolocated to show where attacks come from.
 
 
 ## Overview
-This project builds a small Security Operations Center (SOC) environment in the cloud using an Azure free account. A virtual machine is deliberately exposed to the public internet so that real-world attackers find it. The VM is exposed by enabling any inbound traffic on Azure NSG Firewall and disabling Windows Firewall on the VM itself. Its security logs are forwarded to Microsoft Sentinel, where I analyze them with KQL, detect malicious activity, and show the geographic origin of the attacks.
-
-**Goal:**  practice the core SOC analyst workflow end to end: collect logs, query them, detect suspicious behavior, and report findings.
+This project builds a small Security Operations Center (SOC) environment in the cloud using an Azure free account. A virtual machine is deliberately exposed to the public internet so that real-world attackers find it. Its security logs are forwarded to **Microsoft Sentinel**, where I analyze them with **KQL**, detect malicious activity, and identify the countries and cities the attacks come from using IP geolocation.
+ 
+**Goal:** practice the core SOC analyst workflow end to end: collect logs, query them, detect suspicious behavior, trace its origin, and report findings.
+ 
+**Scope:** detection and attacker-origin analysis with KQL tables. Map visualization is out of scope for now.
 
 ## Architecture
 <img src="https://i.imgur.com/SerdDep.jpeg" height="80%" width="80%" alt="Architecture"/>
@@ -21,6 +23,7 @@ This project builds a small Security Operations Center (SOC) environment in the 
 | Log collection | Azure Monitor Agent + Data Collection Rule |
 | SIEM | Microsoft Sentinel on a Log Analytics workspace |
 | Query language | Kusto Query Language (KQL) |
+| Enrichment | `geo_info_from_ip_address()` (KQL built-in GeoIP) |
 
 
 
@@ -77,18 +80,17 @@ SecurityEvent
 | take 20
 ```
  
-**3. Failed logons enriched with location (for the map)**
+**3. Where attacks come from: failed logons by country and city**
  
 ```kusto
 SecurityEvent
 | where EventID == 4625 and isnotempty(IpAddress)
 | extend geo = geo_info_from_ip_address(IpAddress)
-| extend Country = tostring(geo.country),
-         City = tostring(geo.city),
-         Latitude = toreal(geo.latitude),
-         Longitude = toreal(geo.longitude)
-| summarize FailedAttempts = count() by IpAddress, Country, City, Latitude, Longitude
+| extend Country = tostring(geo.country), City = tostring(geo.city)
+| summarize FailedAttempts = count(), UniqueIPs = dcount(IpAddress) by Country
+| order by FailedAttempts desc
 ```
+
  
 **4. Brute-force pattern: 10+ failures from one IP within 5 minutes**
  
