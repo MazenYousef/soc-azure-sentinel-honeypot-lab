@@ -101,7 +101,7 @@ SecurityEvent
 | order by FailedAttempts desc
 ```
  
-![Failed logons by country](images/attacks-by-country.png)
+
  
 **4. Brute-force pattern: 10+ failures from one IP within 5 minutes** — [`04-brute-force-detection.kql`](queries/04-brute-force-detection.kql)
  
