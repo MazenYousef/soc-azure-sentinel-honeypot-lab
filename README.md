@@ -1,15 +1,16 @@
 # SOC - Azure Sentinel Honeypot Home Lab
 
 ## Description
-Cloud SOC home lab on Microsoft Azure: an intentionally exposed VM acts as a honeypot and forwards its logs to Microsoft Sentinel (SIEM). Malicious login attempts are detected with KQL, and each attacking IP is geolocated to show where attacks come from.
+Cloud SOC home lab on Microsoft Azure: an intentionally exposed Windows VM acts as a honeypot and forwards its security logs to Microsoft Sentinel (SIEM). Malicious login attempts are detected with KQL, each attacking IP is geolocated to show where attacks come from, and a scheduled analytics rule turns brute-force activity into Sentinel incidents.
 
 
 ## Overview
 This project builds a small Security Operations Center (SOC) environment in the cloud using an Azure free account. A virtual machine is deliberately exposed to the public internet so that real-world attackers find it. Its security logs are forwarded to **Microsoft Sentinel**, where I analyze them with **KQL**, detect malicious activity, and identify the countries and cities the attacks come from using IP geolocation.
  
-**Goal:** practice the core SOC analyst workflow end to end: collect logs, query them, detect suspicious behavior, trace its origin, and report findings.
+**Goal:** practice the core SOC analyst workflow end to end: collect logs, query them, detect suspicious behavior, trace its origin, alert on it, and report findings.
  
-**Scope:** detection and attacker-origin analysis with KQL tables. Map visualization is out of scope for now.
+**Scope:** detection, alerting, and attacker-origin analysis with KQL tables. Map visualization is out of scope for now.
+
 
 ## Architecture
 <img src="https://i.imgur.com/SerdDep.jpeg" height="80%" width="80%" alt="Architecture"/>
@@ -125,14 +126,21 @@ Observation window: **24 hours**
  
 **Observations:** Attacks started within minutes of exposure and came in bursts rather than evenly. A small number of IPs produced most of the volume, and the username lists were dominated by default accounts such as administrator and admin. No attacker achieved a successful logon.
 
+## Cleanup
+ 
+- Delete the resource group `rg-honeypot-lab` to remove the VM, NSG, workspace, and Sentinel in one step.
+- Confirm in Cost Management that no resources are still billing.
+
 ## Skills Demonstrated
  
 - SIEM deployment and log onboarding (Microsoft Sentinel, Azure Monitor Agent, Data Collection Rules)
 - KQL log analysis and threat detection
-- Detection engineering: scheduled analytics rule
+- Detection engineering: scheduled analytics rule with entity mapping and incident creation
 - Threat intelligence basics: IP geolocation and MITRE ATT&CK mapping
 - Cloud security and network exposure control (NSG)
+- Cost control and safe lab teardown
 - Documentation and reporting
+
 
 ---
 *Author: Mazen Yousef | [LinkedIn](https://linkedin.com/in/mazenyousef) | [TryHackMe](https://tryhackme.com/p/mazen.yousef)*
