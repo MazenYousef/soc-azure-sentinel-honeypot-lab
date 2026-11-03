@@ -1,0 +1,6 @@
+// Brute-force pattern: 10+ failed logons from one IP within 5 minutes
+SecurityEvent
+| where EventID == 4625
+| summarize Failures = count() by IpAddress, bin(TimeGenerated, 5m)
+| where Failures >= 10
+| order by Failures desc

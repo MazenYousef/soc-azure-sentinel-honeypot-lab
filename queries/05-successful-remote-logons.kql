@@ -1,0 +1,4 @@
+// Successful network (3) and RDP (10) logons — verify none are from unknown IPs
+SecurityEvent
+| where EventID == 4624 and LogonType in (3, 10)
+| summarize Logons = count() by IpAddress, TargetUserName

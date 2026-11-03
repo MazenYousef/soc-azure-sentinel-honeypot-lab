@@ -1,0 +1,6 @@
+// Top 20 usernames targeted by failed logons
+SecurityEvent
+| where EventID == 4625
+| summarize Attempts = count() by TargetUserName
+| order by Attempts desc
+| take 20

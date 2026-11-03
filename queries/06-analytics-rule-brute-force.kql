@@ -1,0 +1,9 @@
+// Sentinel scheduled analytics rule: brute force (MITRE T1110)
+// Run every 5 min, lookup 5 min, alert when results > 0
+// Entity mapping: IP -> IpAddress, Account -> TargetUserName
+SecurityEvent
+| where EventID == 4625 and isnotempty(IpAddress)
+| summarize Failures = count(), TargetedAccounts = make_set(TargetUserName, 10)
+    by IpAddress, bin(TimeGenerated, 5m)
+| where Failures >= 10
+| extend TargetUserName = tostring(TargetedAccounts[0])

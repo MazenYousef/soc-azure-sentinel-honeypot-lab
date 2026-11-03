@@ -1,0 +1,7 @@
+// Failed logons geolocated by country (built-in GeoIP)
+SecurityEvent
+| where EventID == 4625 and isnotempty(IpAddress)
+| extend geo = geo_info_from_ip_address(IpAddress)
+| extend Country = tostring(geo.country), City = tostring(geo.city)
+| summarize FailedAttempts = count(), UniqueIPs = dcount(IpAddress) by Country
+| order by FailedAttempts desc

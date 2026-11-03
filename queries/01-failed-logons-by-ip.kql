@@ -1,0 +1,5 @@
+// Failed logons (Event ID 4625) by source IP
+SecurityEvent
+| where EventID == 4625
+| summarize FailedAttempts = count() by IpAddress
+| order by FailedAttempts desc
